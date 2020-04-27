@@ -1,3 +1,6 @@
 {
-    "python.pythonPath": "C:\\Users\\kevin\\.virtualenvs\\umbrella-sites-fJ_YqD5Z\\Scripts\\python.exe"
+    "python.pythonPath": "C:\\Users\\Kevin\\.virtualenvs\\umbrella-cli-kX0wykcy\\Scripts\\python.exe",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "editor.rulers": [80]
 }
