@@ -11,7 +11,7 @@ stages:
 test:
   stage: test
   script:
-    - python -m unittest --start-directory ./tests
+    - python -m unittest
 
 deploy_testpypi:
   stage: staging
