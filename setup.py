@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='cisco-umbrella-cli',
-    description="Command-line interface for Cisco Umbrella API"
+    description="Command-line interface for Cisco Umbrella API",
     author="Kevin C-Dubois",
     version='0.0.1',
     packages=find_packages(),
