@@ -6,7 +6,6 @@ before_script:
 
 stages:
   - test
-  - staging
   - deploy
 
 test-unit:
@@ -15,7 +14,7 @@ test-unit:
     - python -m unittest
 
 deploy_testpypi:
-  stage: staging
+  stage: deploy
   script:
     - python setup.py sdist bdist_wheel
     - twine upload -r testpypi dist/*
