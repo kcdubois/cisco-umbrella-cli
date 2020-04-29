@@ -7,7 +7,7 @@ before_script:
 stages:
   - test
   - staging
-  
+  - deploy
 
 test:
   stage: test
@@ -21,3 +21,12 @@ deploy_testpypi:
     - twine upload -r testpypi dist/*
   only:
     - tags
+
+deploy_pypi:
+  stage: deploy
+  script:
+    - python setup.py sdist bdist_wheel
+    - twine upload dist/*
+  only:
+    - manual
+    - master
