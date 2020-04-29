@@ -6,13 +6,15 @@ before_script:
 
 stages:
   - test
-  - deploy
+  - staging
 
 test:
+  stage: test
   script:
     - python -m unittest --start-directory ./tests
 
-deploy:
+deploy_testpypi:
+  stage: deploy
   script:
     - twine upload --repository testpypi
   only:
