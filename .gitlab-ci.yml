@@ -2,7 +2,7 @@ image: python:3.7
 
 before_script:
   - pip install pipenv setuptools twine
-  - pipenv install 
+  - pipenv install --system
 
 stages:
   - test
