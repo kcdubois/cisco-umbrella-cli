@@ -14,7 +14,7 @@ test:
     - python -m unittest --start-directory ./tests
 
 deploy_testpypi:
-  stage: deploy
+  stage: staging
   script:
     - twine upload --repository testpypi
   only:
