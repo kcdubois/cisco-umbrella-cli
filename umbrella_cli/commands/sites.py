@@ -6,7 +6,7 @@ import click
 import requests
 from requests.auth import HTTPBasicAuth
 
-from umbrella_cli.serializers import UmbrellaSite
+from umbrella_cli.serializers import SiteSerializer
 
 
 BASE_URL = "https://management.api.umbrella.com/v1/"
@@ -27,7 +27,7 @@ def sites(ctx):
 def get(ctx):
     """ Get the list of sites """
     url = BASE_URL + "/organizations/{org_id}/sites".format(org_id=ctx.obj['ORG'])
-    schema = UmbrellaSite(many=True)
+    schema = SiteSerializer(many=True)
 
     response = requests.get(url, headers=HEADERS, auth=HTTPBasicAuth(ctx.obj['ACCESS'], ctx.obj['SECRET']), verify=False)
 
