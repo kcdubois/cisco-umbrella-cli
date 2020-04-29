@@ -16,8 +16,12 @@ umbrella-cli.py version
 
 ### Installing
 
-For now, the package is standalone, but will eventually migrate to using setuptools and uploaded on PyPI to be installed globally.
+The package is now available on Pypi, it is now possible to install it using pip.
 
+```
+pip install cisco-umbrella-cli
+umbrella-cli --help
+```
 
 
 ### Built with
