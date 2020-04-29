@@ -16,6 +16,6 @@ test:
 deploy_testpypi:
   stage: staging
   script:
-    - twine upload --repository testpypi
+    - twine upload -r testpypi
   only:
     - master
