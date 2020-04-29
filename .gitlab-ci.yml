@@ -9,7 +9,7 @@ stages:
   - staging
   - deploy
 
-test:
+test-unit:
   stage: test
   script:
     - python -m unittest
@@ -27,5 +27,6 @@ deploy_pypi:
   script:
     - python setup.py sdist bdist_wheel
     - twine upload dist/*
+  when: manual
   only:
-    - manual
+    - master
