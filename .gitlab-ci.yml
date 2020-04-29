@@ -16,6 +16,7 @@ test:
 deploy_testpypi:
   stage: staging
   script:
-    - twine upload -r testpypi
+    - python setup.py sdist bdist_wheel
+    - twine upload -r testpypi dist/*
   only:
     - master
