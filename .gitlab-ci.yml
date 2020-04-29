@@ -1,0 +1,19 @@
+image: python:3.7-alpine
+
+before_script:
+  - pip install pipenv setuptools twine
+  - pipenv install 
+
+stages:
+  - test
+  - deploy
+
+test:
+  script:
+    - python -m unittest --start-directory ./tests
+
+deploy:
+  script:
+    - twine upload --repository testpypi
+  only:
+    - master
