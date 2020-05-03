@@ -6,7 +6,6 @@ from requests.auth import HTTPBasicAuth
 
 from umbrella_cli.commands import sites
 
-
 requests.urllib3.disable_warnings() #? Disable HTTPS warnings for requests
 
 
@@ -24,8 +23,10 @@ def cli(ctx, access, secret, org):
 
 
 #? Adding commands to group
-cli.add_command(sites.command_group)
+cli.add_command(sites)
 
+
+name = "umbrella-cli"
 
 if __name__ == "__main__":
     cli(obj={}) # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
