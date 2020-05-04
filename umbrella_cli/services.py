@@ -16,8 +16,13 @@ class ManagementApiService:
         "Content-Type": "application/json"
     }
     
-    def __init__(self, org_id):
+    def authenticate(self, access, secret):
+        """ Returns the Basic Authorization object"""
+        return requests.auth.HTTPBasicAuth(access, secret)
+
+    def __init__(self, access, secret, org_id):
         self.org_id = org_id
+        self.auth = self.authenticate(access, secret)
 
     def get_sites(self):
         """ Returns a single site or all sites """
@@ -27,7 +32,10 @@ class ManagementApiService:
 
         schema = serializers.SiteSerializer(many=True)
 
-        response = requests.get(url, headers=self.HEADERS, verify=False)
+        response = requests.get(
+            url, headers=self.HEADERS, 
+            auth=self.auth, verify=False
+        )
 
         if response.status_code == 200:
             return schema.load(response.json())

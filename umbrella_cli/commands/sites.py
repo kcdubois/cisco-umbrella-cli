@@ -19,7 +19,11 @@ def sites(ctx):
 @click.pass_context
 def list(ctx):
     """ Get the list of sites """
-    api = ManagementApiService(ctx.obj["ORG"])
+    api = ManagementApiService(
+        access=ctx.obj["ACCESS"], 
+        secret=ctx.obj["SECRET"], 
+        org_id=ctx.obj["ORG"]
+    )
     
     try:
         sites = api.get_sites()
