@@ -37,6 +37,6 @@ def list(ctx):
         click.echo("---------------------------------------------")
 
     except ApiError as error:
-        click.secho(error, fg="red")
+        click.secho(str(error), fg="red")
 
     

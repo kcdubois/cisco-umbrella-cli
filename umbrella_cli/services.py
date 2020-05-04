@@ -10,7 +10,7 @@ class ApiError(Exception):
     pass
 
 class ManagementApiService:
-    BASE_URL = "https://management.api.umbrella.com/v1/"
+    BASE_URL = "https://management.api.umbrella.com/v1"
     HEADERS = {
         "Accept": "application/json",
         "Content-Type": "application/json"

@@ -45,7 +45,7 @@ class TestManagementApiService:
         sites = api.get_sites()
 
         mock_requests.get.assert_called_with(
-            api.BASE_URL + "/organizations/1234567/sites",
+            "https://management.api.umbrella.com/api/v1/organizations/1234567/sites",
             headers=api.HEADERS,
             verify=False
         )
