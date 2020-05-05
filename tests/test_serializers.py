@@ -98,3 +98,32 @@ class TestSiteSerializer:
         with pytest.raises(ValidationError):
             schema = serializers.SiteSerializer()
             schema.loads(data)
+
+    def test_site_dump_for_new_object(self):
+        """ Test a serializer dump with read-write fields only"""
+        site = models.Site(name="Test")
+
+        schema = serializers.SiteSerializer()
+        result = schema.dump(site)
+
+        assert result == {"name":"Test"}
+
+    def test_site_dump_read_only_fields(self, single_site):
+        """ Test a serializer dump with read_only fields """
+        
+        site = models.Site(
+            origin_id=385265878,
+            is_default=False,
+            name="Home Office",
+            modified_at="2020-03-20T18:08:36.000Z",
+            created_at="2020-03-20T18:08:36.000Z",
+            type="site",
+            internal_network_count=2,
+            va_count=2,
+            site_id=1334164
+            )
+        schema = serializers.SiteSerializer()
+
+        result = schema.dump(site)
+
+        assert result == {"name": "Home Office"}

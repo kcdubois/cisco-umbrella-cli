@@ -9,7 +9,7 @@ from umbrella_cli.commands import sites
 requests.urllib3.disable_warnings() #? Disable HTTPS warnings for requests
 
 
-@click.group()
+@click.group(name="umbrella-cli")
 @click.option("--access", prompt="Enter your API Access key", help="Umbrella API Access Key")
 @click.option("--secret", prompt="Enter your API Secret key", hide_input=True, help="Umbrella API Secret Key")
 @click.option("--org", prompt="Enter your organization ID", help="Umbrella Organizaton ID")
@@ -25,8 +25,6 @@ def cli(ctx, access, secret, org):
 #? Adding commands to group
 cli.add_command(sites)
 
-
-name = "umbrella-cli"
 
 if __name__ == "__main__":
     cli(obj={}) # pylint: disable=no-value-for-parameter,unexpected-keyword-arg
