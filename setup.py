@@ -14,6 +14,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        umbrella-cli=umbrella_cli.cli:main
+        umbrella-cli=umbrella_cli.cli:cli
     ''',
 )
