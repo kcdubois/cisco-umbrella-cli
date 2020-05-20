@@ -13,84 +13,93 @@ from umbrella_cli import models
 
 class TestManagementApiService:
 
-    @mock.patch("umbrella_cli.services.requests.get")
-    def test_get_sites_ok(self, mock_requests):
-        """ Test the GET sites with valid data """
-        api = services.ManagementApiService("ACCESS", "SECRET", 1234567)
+    @pytest.fixture
+    def single_site(self):
+        return {
+            "originId": 395218748,
+            "isDefault": False,
+            "name": "Test",
+            "modifiedAt": "2020-04-05T19:07:38.000Z",
+            "createdAt": "2020-04-05T19:07:38.000Z",
+            "type": "site",
+            "internalNetworkCount": 2,
+            "vaCount": 4,
+            "siteId": 1479824
+        }
 
-        assert api.org_id == 1234567
-        
-        mock_requests.return_value.status_code = 200
-        mock_requests.return_value.json.return_value = [
-                {
-                    "originId": 395218748,
-                    "isDefault": False,
-                    "name": "BLUE",
-                    "modifiedAt": "2020-04-05T19:07:38.000Z",
-                    "createdAt": "2020-04-05T19:07:38.000Z",
-                    "type": "site",
-                    "internalNetworkCount": 2,
-                    "vaCount": 4,
-                    "siteId": 1479824
-                },
-                {
-                    "originId": 136056751,
-                    "isDefault": True,
-                    "name": "Default Site",
-                    "modifiedAt": "2018-03-06T01:23:13.000Z",
-                    "createdAt": "2018-03-06T01:23:13.000Z",
-                    "type": "site",
-                    "internalNetworkCount": 0,
-                    "vaCount": 0,
-                    "siteId": 635875
-                }]
-
-        sites = api.get_sites()
-
-        mock_requests.assert_called_with(
-            "https://management.api.umbrella.com/v1/organizations/1234567/sites",
-            auth=HTTPBasicAuth("ACCESS", "SECRET"),
-            headers=api.HEADERS,
-            verify=False
-        )
-
-    @mock.patch("umbrella_cli.services.requests.get")
-    def test_get_sites_404(self, mock_requests):
-        """ Test the ApiNotFoundError exception """
-        api = services.ManagementApiService("ACCESS", "SECRET", 1234567)
-
-        mock_requests.return_value.status_code = 404
-
-        with pytest.raises(services.ApiNotFoundError):
-            api.get_sites()
-
-    @mock.patch("umbrella_cli.services.requests.post")
-    def test_create_site_with_valid_data(self, mock_requests):
-        """ Create a site with valid data """
-        api = services.ManagementApiService("ACCESS", "SECRET", 1234567)
-
-        mock_requests.return_value.status_code = 200
-        mock_requests.return_value.json.return_value = {
+    @pytest.fixture
+    def multiple_sites(self):
+        return [
+            {
                 "originId": 395218748,
                 "isDefault": False,
-                "name": "Test",
+                "name": "BLUE",
                 "modifiedAt": "2020-04-05T19:07:38.000Z",
                 "createdAt": "2020-04-05T19:07:38.000Z",
                 "type": "site",
                 "internalNetworkCount": 2,
                 "vaCount": 4,
                 "siteId": 1479824
+            },
+            {
+                "originId": 136056751,
+                "isDefault": True,
+                "name": "Default Site",
+                "modifiedAt": "2018-03-06T01:23:13.000Z",
+                "createdAt": "2018-03-06T01:23:13.000Z",
+                "type": "site",
+                "internalNetworkCount": 0,
+                "vaCount": 0,
+                "siteId": 635875
             }
+        ]
+
+    @mock.patch("umbrella_cli.services.requests.get")
+    def test_get_sites_ok(self, mock_requests, multiple_sites):
+        """ Test the GET sites with valid data """
+        api = services.SitesEndpointService("ACCESS", "SECRET", 1234567)
+
+        assert api.org_id == 1234567
+        
+        mock_requests.return_value.status_code = 200
+        mock_requests.return_value.json.return_value = multiple_sites
+
+        api.get_list()
+
+        mock_requests.assert_called_with(
+            url="https://management.api.umbrella.com/v1/organizations/1234567/sites",
+            auth=HTTPBasicAuth("ACCESS", "SECRET"),
+            headers=api._headers,
+            verify=False
+        )
+
+    @mock.patch("umbrella_cli.services.requests.get")
+    def test_get_sites_404(self, mock_requests):
+        """ Test the ApiNotFoundError exception """
+        api = services.SitesEndpointService("ACCESS", "SECRET", 1234567)
+
+        mock_requests.return_value.status_code = 404
+
+        with pytest.raises(services.ApiNotFoundError):
+            api.get_list()
+
+    @mock.patch("umbrella_cli.services.requests.post")
+    def test_create_site_with_valid_data(self, mock_requests, single_site):
+        """ Create a site with valid data """
+        api = services.SitesEndpointService("ACCESS", "SECRET", 1234567)
+
+        mock_requests.return_value.status_code = 200
+        mock_requests.return_value.json.return_value = single_site
 
         site = models.Site(name="Test")
 
-        result = api.create_site(site)
+        result = api.create(site)
 
         mock_requests.assert_called_with(
-            "https://management.api.umbrella.com/v1/organizations/1234567/sites",
-            headers=api.HEADERS,
-            json={"name":"Test"},
+            url="https://management.api.umbrella.com/v1/organizations/1234567/sites",
             auth=HTTPBasicAuth("ACCESS", "SECRET"),
+            headers=api._headers,
+            json={"name":"Test"},
             verify=False
         )
 

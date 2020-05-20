@@ -6,7 +6,7 @@ import click
 import requests
 from requests.auth import HTTPBasicAuth
 
-from umbrella_cli.services import ManagementApiService, ApiError
+from umbrella_cli import services
 from umbrella_cli.models import Site
 
 @click.group()
@@ -19,14 +19,14 @@ def sites(ctx):
 @click.pass_context
 def get_all(ctx):
     """ Get the list of sites """
-    api = ManagementApiService(
+    api = services.SitesEndpointService(
         access=ctx.obj["ACCESS"], 
         secret=ctx.obj["SECRET"], 
         org_id=ctx.obj["ORG"]
     )
     
     try:
-        sites = api.get_sites()
+        sites = api.get_list()
 
         click.echo("""
 +===============================================+
@@ -40,7 +40,9 @@ def get_all(ctx):
         
         click.echo("+===============================================+")
 
-    except ApiError as error:
+    except services.ApiError as error:
+        click.secho(str(error), fg="yellow")
+    except Exception as error:
         click.secho(str(error), fg="red")
 
 @sites.command()
@@ -48,7 +50,7 @@ def get_all(ctx):
 @click.pass_context
 def create(ctx, name):
     """ Create a new site """
-    api = ManagementApiService(
+    api = services.SitesEndpointService(
         access=ctx.obj["ACCESS"], 
         secret=ctx.obj["SECRET"], 
         org_id=ctx.obj["ORG"]
@@ -57,11 +59,12 @@ def create(ctx, name):
     try:
         site = Site(name)
 
-        result = api.create_site(site)
+        result = api.create(site)
 
         click.secho("New site created with ID {id}".format(id=result.site_id),
                     fg="green")
-    except ApiError as error:
+    except services.ApiError as error:
+        click.secho(str(error), fg="yellow")
+    except Exception as error:
         click.secho(str(error), fg="red")
-
     
