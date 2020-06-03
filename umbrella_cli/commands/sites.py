@@ -40,8 +40,6 @@ def get_all(ctx):
         
         click.echo("+===============================================+")
 
-    except services.ApiError as error:
-        click.secho(str(error), fg="yellow")
     except Exception as error:
         click.secho(str(error), fg="red")
 
@@ -63,8 +61,6 @@ def create(ctx, name):
 
         click.secho("New site created with ID {id}".format(id=result.site_id),
                     fg="green")
-    except services.ApiError as error:
-        click.secho(str(error), fg="yellow")
     except Exception as error:
         click.secho(str(error), fg="red")
     
