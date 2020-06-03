@@ -83,7 +83,10 @@ class TestManagementApiService:
         api.get_list()
 
         mock_requests.assert_called_with(
-            url="https://management.api.umbrella.com/v1/organizations/1234567/sites",
+            url=(
+                "https://management.api.umbrella.com"
+                "/v1/organizations/1234567/sites"
+            ),
             auth=HTTPBasicAuth("ACCESS", "SECRET"),
             headers=api._headers,
             verify=False
@@ -102,7 +105,10 @@ class TestManagementApiService:
         result = api.create(site)
 
         mock_requests.assert_called_with(
-            url="https://management.api.umbrella.com/v1/organizations/1234567/sites",
+            url=(
+                "https://management.api.umbrella.com"
+                "/v1/organizations/1234567/sites"
+            ),
             auth=HTTPBasicAuth("ACCESS", "SECRET"),
             headers=api._headers,
             json={"name":"Test"},
@@ -114,6 +120,19 @@ class TestManagementApiService:
         assert result.internal_network_count == 2
         
 
+class TestSiteService:
+    def test_internal_network_service_url(self):
+        """ Validate the generated URL """
+        expected_url = (
+            "https://management.api.umbrella.com/v1"
+            "/organizations/1234567/sites"
+        )
+
+        api = services.SitesEndpointService("ACCESS", "SECRET", 1234567)
+
+        assert expected_url == api._get_absolute_url()
+
+
 class TestInternalNetworkService:
     def test_internal_network_service_url(self):
         """ Validate the generated URL """
@@ -122,6 +141,6 @@ class TestInternalNetworkService:
             "/organizations/1234567/internalnetworks"
         )
 
-        api = services.InternalNetworkService("ACCESS", "SECRET", 1234567)
+        api = services.InternalNetworkEndpointService("ACCESS", "SECRET", 1234567)
 
         assert expected_url == api._get_absolute_url()

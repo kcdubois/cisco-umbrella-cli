@@ -11,6 +11,9 @@ from umbrella_cli import models
 
 
 class ManagementApiService:
+    """
+    Base API Service class to generate basic CRUD operations.
+    """
     _base_url = "https://management.api.umbrella.com/v1"
     _headers = {
         "Accept": "application/json",
@@ -113,15 +116,18 @@ class ManagementApiService:
 
 
 class SitesEndpointService(ManagementApiService):
+    """
+    API Service representing the Sites endpoint.
+    """
     _endpoint = "organizations/{}/sites"
     _schema = serializers.SiteSerializer
     _model = models.Site
     _id = "site_id"
 
 
-class InternalNetworkService(ManagementApiService):
+class InternalNetworkEndpointService(ManagementApiService):
     """
-    API Service representing the Internal Network endpoint 
+    API Service representing the Internal Network endpoint.
     """
     _endpoint = "organizations/{}/internalnetworks"
     _schema = serializers.InternalNetworkSerializer
