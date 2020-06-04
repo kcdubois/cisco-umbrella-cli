@@ -30,7 +30,7 @@ class TestSitesCommands:
             models.Site(site_id=1234567, name="Default Site")
         ]
 
-        result = runner.invoke(cli, credentials + ["sites", "get-all"])
+        result = runner.invoke(cli, credentials + ["sites", "list"])
 
         assert "Umbrella Sites for Organization" in result.output
         assert "1479824 | BLUE" in result.output
@@ -42,7 +42,7 @@ class TestSitesCommands:
         mock_api_service.side_effect = HTTPError(
             "An error occured in services.")
 
-        result = runner.invoke(cli, credentials + ["sites", "get-all"])
+        result = runner.invoke(cli, credentials + ["sites", "list"])
 
         assert "An error occured in services." in result.output
 

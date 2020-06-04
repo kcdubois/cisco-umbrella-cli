@@ -49,7 +49,7 @@ class InternalNetworkSerializer(BaseSerializer):
     ip_address = fields.String(required=True, data_key="ipAddress")
     prefix_length = fields.Integer(required=True, data_key="prefixLength")
     site_id = fields.Integer(data_key="siteId")
-    site_name = fields.String(data_key="siteName")
+    site_name = fields.String(load_only=True, data_key="siteName")
     network_name = fields.String(load_only=True, data_key="networkName")
     network_id = fields.Integer(data_key="networkId")
     tunnel_name = fields.String(load_only=True, data_key="tunnelName")

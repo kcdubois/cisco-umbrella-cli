@@ -3,6 +3,7 @@
 """
 
 import logging
+import csv
 
 import requests
 
@@ -72,7 +73,7 @@ class ManagementApiService:
         url = self._get_absolute_url()
 
         payload = self._schema().dump(obj)
-
+        
         response = requests.post(
             url=url, auth=self.auth, headers=self._headers,
             json=payload, verify=False
@@ -133,3 +134,54 @@ class InternalNetworkEndpointService(ManagementApiService):
     _schema = serializers.InternalNetworkSerializer
     _model = models.InternalNetwork
     _id = "internal_network_id"
+
+
+
+class InternalNetworkCsvService:
+    """
+    Backend service to interact with CSV files for Internal networks.
+    EXPECTED FORMAT: <name>,<network>,<prefix>,<site_name>
+    """
+
+    def __init__(self, fp, delimiter=","):
+        self._csv_lines = []
+
+        try:
+            with open(fp) as csvfile:
+                reader = csv.DictReader(csvfile)
+                for line in reader:
+                    self._csv_lines.append(line)
+        except IOError:
+            raise
+
+    def sites(self):
+        """
+        Returns the list of unique sites in the internal networks.
+        """
+        sites = set()
+
+        for line in self._csv_lines:
+            sites.add(models.Site(line['site_name']))
+        
+        return sites
+
+    def internal_networks(self):
+        """
+        Returns the list of internal networks
+        """
+        internal_networks = []
+        for line in self._csv_lines:
+            internal_networks.append(
+                models.InternalNetwork(
+                    name=line['name'],
+                    ip_address=line['network'],
+                    prefix_length=line['prefix'],
+                    site_name=line['site_name']
+                )
+            )
+
+        return internal_networks
+    
+
+
+    
