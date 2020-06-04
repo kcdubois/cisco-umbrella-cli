@@ -4,7 +4,7 @@ setup(
     name='cisco-umbrella-cli',
     description="Command-line interface for Cisco Umbrella API",
     author="Kevin C-Dubois",
-    version='0.1.6',
+    version='0.2',
     packages=find_packages(),
     install_requires=[
         'click',

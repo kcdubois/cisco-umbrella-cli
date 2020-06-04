@@ -127,3 +127,128 @@ class TestSiteSerializer:
         result = schema.dump(site)
 
         assert result == {"name": "Home Office"}
+
+
+class TestInternalNetworkSerializer:
+    """ Test cases for umbrella_cli.serializers.InternalNetworkSerializer """
+
+    @pytest.fixture
+    def serializer(self):
+        return serializers.InternalNetworkSerializer
+
+    @pytest.fixture
+    def single_object(self):
+        """ Returns a single object """
+        return """{
+        "originId": 396397650,
+        "ipAddress": "10.1.200.0",
+        "prefixLength": 24,
+        "createdAt": "2020-04-08T02:51:34.000Z",
+        "modifiedAt": "2020-04-08T02:51:34.000Z",
+        "name": "RED",
+        "siteId": 1479824,
+        "siteName": ""}
+        """    
+
+    @pytest.fixture
+    def multiple_objects(self):
+        """ Return a list of objects """
+        return """[
+    {
+        "originId": 396397504,
+        "ipAddress": "10.1.100.0",
+        "prefixLength": 24,
+        "createdAt": "2020-04-08T02:51:00.000Z",
+        "modifiedAt": "2020-04-08T02:51:00.000Z",
+        "name": "BLUE",
+        "siteId": 1479824,
+        "siteName": ""
+    },
+    {
+        "originId": 396397650,
+        "ipAddress": "10.1.200.0",
+        "prefixLength": 24,
+        "createdAt": "2020-04-08T02:51:34.000Z",
+        "modifiedAt": "2020-04-08T02:51:34.000Z",
+        "name": "RED",
+        "siteId": 1479824,
+        "siteName": ""
+    }]"""
+
+    def test_internal_network_single_valid_load(self, single_object, serializer):
+        """
+        Test a single object getting serialized successfully
+        """
+        result = serializer().loads(single_object)
+
+        assert isinstance(result, models.InternalNetwork)
+
+        assert result.origin_id == 396397650
+        assert result.name == "RED"
+        assert result.ip_address == "10.1.200.0"
+        assert result.prefix_length == 24
+        assert result.created_at == "2020-04-08T02:51:34.000Z"
+        assert result.modified_at == "2020-04-08T02:51:34.000Z"
+        assert result.site_id == 1479824
+        assert result.site_name == ""
+
+    def test_internal_network_single_raise_exception(self, serializer):
+        """
+        Test a single object with wrong data types raising a ValidationError
+        """
+        data = """
+            {
+                "originId": "123",
+                "name": 123
+            }
+        """
+
+        with pytest.raises(ValidationError):
+            serializer().loads(data)
+
+    def test_internal_network_multiple_valid_load(self, multiple_objects, 
+                                                  serializer):
+        """
+        Test multiple objects getting serialized successfully
+        """
+        result = serializer().loads(multiple_objects, many=True)
+
+        assert len(result) == 2
+        assert isinstance(result[0], models.InternalNetwork)
+        assert isinstance(result[1], models.InternalNetwork)
+
+
+    def test_internal_network_single_valid_dump(self, serializer):
+        """
+        Test the serialization of a model object.
+        """
+        instance = models.InternalNetwork(
+            name="TEST",
+            ip_address="192.0.2.0",
+            prefix_length=24,
+            network_id=123456,
+            created_at="2020-04-08T02:51:34.000Z"
+        )
+
+        result = serializer().dump(instance)
+
+        assert result == {
+            "name": "TEST",
+            "ipAddress": "192.0.2.0",
+            "prefixLength": 24,
+            "networkId": 123456
+        }
+
+    def test_internal_network_single_dump_raises_validation_error(
+            self, serializer):
+        """
+        Test the serialization of a model object with wron
+        """
+        instance = models.InternalNetwork(
+            name="TEST",
+            ip_address="192.0.2.0",
+            prefix_length="twenty-four"
+        )
+
+        with pytest.raises(ValueError):
+            serializer().dump(instance)

@@ -7,12 +7,16 @@ from unittest import mock
 
 import pytest
 from requests.auth import HTTPBasicAuth
+from requests import HTTPError
 
 from umbrella_cli import services
 from umbrella_cli import models
 
 class TestManagementApiService:
 
+    """
+        Pytest fixtures
+    """
     @pytest.fixture
     def single_site(self):
         return {
@@ -54,6 +58,18 @@ class TestManagementApiService:
             }
         ]
 
+    def test_get_absolute_url(self):
+        """ 
+        Check that the URL constructed from the base URL and endpoint is valid
+        """
+        expected_url = (
+            "https://management.api.umbrella.com/v1"
+            "/organizations/1234567/"
+        )
+        api = services.ManagementApiService("ACCESS", "SECRET", 1234567)
+
+        assert expected_url == api._get_absolute_url()
+
     @mock.patch("umbrella_cli.services.requests.get")
     def test_get_sites_ok(self, mock_requests, multiple_sites):
         """ Test the GET sites with valid data """
@@ -67,21 +83,14 @@ class TestManagementApiService:
         api.get_list()
 
         mock_requests.assert_called_with(
-            url="https://management.api.umbrella.com/v1/organizations/1234567/sites",
+            url=(
+                "https://management.api.umbrella.com"
+                "/v1/organizations/1234567/sites"
+            ),
             auth=HTTPBasicAuth("ACCESS", "SECRET"),
             headers=api._headers,
             verify=False
         )
-
-    @mock.patch("umbrella_cli.services.requests.get")
-    def test_get_sites_404(self, mock_requests):
-        """ Test the ApiNotFoundError exception """
-        api = services.SitesEndpointService("ACCESS", "SECRET", 1234567)
-
-        mock_requests.return_value.status_code = 404
-
-        with pytest.raises(services.ApiNotFoundError):
-            api.get_list()
 
     @mock.patch("umbrella_cli.services.requests.post")
     def test_create_site_with_valid_data(self, mock_requests, single_site):
@@ -96,7 +105,10 @@ class TestManagementApiService:
         result = api.create(site)
 
         mock_requests.assert_called_with(
-            url="https://management.api.umbrella.com/v1/organizations/1234567/sites",
+            url=(
+                "https://management.api.umbrella.com"
+                "/v1/organizations/1234567/sites"
+            ),
             auth=HTTPBasicAuth("ACCESS", "SECRET"),
             headers=api._headers,
             json={"name":"Test"},
@@ -108,3 +120,27 @@ class TestManagementApiService:
         assert result.internal_network_count == 2
         
 
+class TestSiteService:
+    def test_internal_network_service_url(self):
+        """ Validate the generated URL """
+        expected_url = (
+            "https://management.api.umbrella.com/v1"
+            "/organizations/1234567/sites"
+        )
+
+        api = services.SitesEndpointService("ACCESS", "SECRET", 1234567)
+
+        assert expected_url == api._get_absolute_url()
+
+
+class TestInternalNetworkService:
+    def test_internal_network_service_url(self):
+        """ Validate the generated URL """
+        expected_url = (
+            "https://management.api.umbrella.com/v1"
+            "/organizations/1234567/internalnetworks"
+        )
+
+        api = services.InternalNetworkEndpointService("ACCESS", "SECRET", 1234567)
+
+        assert expected_url == api._get_absolute_url()

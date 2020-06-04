@@ -6,6 +6,8 @@ from unittest import mock
 import pytest
 from click.testing import CliRunner
 
+from requests import HTTPError
+
 from umbrella_cli import cli
 from umbrella_cli import services
 from umbrella_cli import models
@@ -28,7 +30,7 @@ class TestSitesCommands:
             models.Site(site_id=1234567, name="Default Site")
         ]
 
-        result = runner.invoke(cli, credentials + ["sites", "get-all"])
+        result = runner.invoke(cli, credentials + ["sites", "list"])
 
         assert "Umbrella Sites for Organization" in result.output
         assert "1479824 | BLUE" in result.output
@@ -37,10 +39,10 @@ class TestSitesCommands:
     def test_services_exception_handling(self, mock_api_service, credentials):
         """ Test the exception handling of the service layer """
         runner = CliRunner()
-        mock_api_service.side_effect = services.ApiError(
+        mock_api_service.side_effect = HTTPError(
             "An error occured in services.")
 
-        result = runner.invoke(cli, credentials + ["sites", "get-all"])
+        result = runner.invoke(cli, credentials + ["sites", "list"])
 
         assert "An error occured in services." in result.output
 

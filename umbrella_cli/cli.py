@@ -4,7 +4,7 @@ import requests
 import click
 from requests.auth import HTTPBasicAuth
 
-from umbrella_cli.commands import sites
+from umbrella_cli import commands
 
 requests.urllib3.disable_warnings() #? Disable HTTPS warnings for requests
 
@@ -23,7 +23,8 @@ def cli(ctx, access, secret, org):
 
 
 #? Adding commands to group
-cli.add_command(sites)
+cli.add_command(commands.sites)
+cli.add_command(commands.internal_networks)
 
 
 if __name__ == "__main__":
