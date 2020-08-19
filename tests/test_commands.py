@@ -9,7 +9,7 @@ from click.testing import CliRunner
 from requests import HTTPError
 
 from umbrella_cli import cli
-from umbrella_cli import services
+from umbrella_cli import managers
 from umbrella_cli import models
 
 class TestSitesCommands:
@@ -21,7 +21,7 @@ class TestSitesCommands:
             "SECRET_KEY", "--org", "1234567"
         ]
 
-    @mock.patch.object(services.SitesEndpointService, "get_list", autospec=True)
+    @mock.patch.object(managers.SitesManager, "get_list", autospec=True)
     def test_sites_get_all(self, mock_api_service, credentials):
         """ Test the output of fetching all sites """
         runner = CliRunner()
@@ -35,7 +35,7 @@ class TestSitesCommands:
         assert "Umbrella Sites for Organization" in result.output
         assert "1479824 | BLUE" in result.output
 
-    @mock.patch.object(services.SitesEndpointService, "get_list", autospec=True)
+    @mock.patch.object(managers.SitesManager, "get_list", autospec=True)
     def test_services_exception_handling(self, mock_api_service, credentials):
         """ Test the exception handling of the service layer """
         runner = CliRunner()
@@ -46,7 +46,7 @@ class TestSitesCommands:
 
         assert "An error occured in services." in result.output
 
-    @mock.patch.object(services.SitesEndpointService, "create", autospec=True)
+    @mock.patch.object(managers.SitesManager, "create", autospec=True)
     def test_site_create(self, mock_api_service, credentials):
         runner = CliRunner()
         mock_api_service.return_value = models.Site(site_id=123456, name="TEST")

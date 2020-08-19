@@ -6,8 +6,8 @@ import click
 import requests
 from requests.auth import HTTPBasicAuth
 
-from umbrella_cli import services
-from umbrella_cli.models import Site
+from umbrella_cli import managers
+from umbrella_cli import models
 
 @click.group(name="sites")
 @click.pass_context
@@ -19,7 +19,7 @@ def sites(ctx):
 @click.pass_context
 def get_all(ctx):
     """ Get the list of sites """
-    api = services.SitesEndpointService(
+    api = managers.SitesManager(
         access=ctx.obj["ACCESS"], 
         secret=ctx.obj["SECRET"], 
         org_id=ctx.obj["ORG"]
@@ -49,14 +49,14 @@ def get_all(ctx):
 @click.pass_context
 def create(ctx, name):
     """ Create a new site """
-    api = services.SitesEndpointService(
+    api = managers.SitesManager(
         access=ctx.obj["ACCESS"], 
         secret=ctx.obj["SECRET"], 
         org_id=ctx.obj["ORG"]
     )
 
     try:
-        site = Site(name)
+        site = models.Site(name)
 
         result = api.create(site)
 
@@ -77,14 +77,14 @@ def bulk_import(ctx, filepath):
         filepath (FileHandler): File handler for CSV ?* to change
     """
 
-    api = services.SitesEndpointService(
+    api = managers.SitesManager(
         access=ctx.obj["ACCESS"], 
         secret=ctx.obj["SECRET"], 
         org_id=ctx.obj["ORG"]
     )
 
     try:
-        csv_service = services.InternalNetworkCsvService(filepath)
+        csv_service = managers.InternalNetworkCsvService(filepath)
 
         sites_to_import = csv_service.sites()
         existing_sites = api.get_list()
