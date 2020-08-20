@@ -11,44 +11,57 @@ from umbrella_cli import serializers
 from umbrella_cli import models
 
 
-class ManagementApiService:
+class BaseManager:
     """
-    Base API Service class to generate basic CRUD operations.
+    Base manager used as a collection of a specific models.
+    """
+    _model = None
+
+
+class RestManager(BaseManager):
+    """
+    Base REST manager class to generate basic CRUD operations on models.
+    Apart from testing, this shouldn't be used directly.
     """
     _base_url = "https://management.api.umbrella.com/v1"
     _headers = {
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    _endpoint = "organizations/{}/"
     _schema = serializers.BaseSerializer
-    _model = None
+    _model_name = None
     _id = None
     
     def _authenticate(self, access, secret):
         """ Returns the Basic Authorization object"""
         return requests.auth.HTTPBasicAuth(access, secret)
 
+    @property
+    def endpoint(self):
+        """ Returns the endpoint's URL path of the manager """
+        return f"organizations/{self.org_id}/{self._model_name}"
+
     def __init__(self, access, secret, org_id):
         self.org_id = org_id
         self.auth = self._authenticate(access, secret)
 
-    def _get_absolute_url(self, *args):
+    @property
+    def url(self):
         """ Returns the full URL based on the endpoint property """
         return "/".join((
             self._base_url, 
-            self._endpoint.format(self.org_id),
-            *args
+            self.endpoint
         ))
 
     def get(self, obj_id):
         """ Generic GET method for single object """
-        url = self._get_absolute_url(obj_id)
+        url = "/".join((self.url, obj_id))
 
         response = requests.get(
             url=url, auth=self.auth, headers=self._headers,
             verify=False
         )
+
         if response.status_code == 200:
             return self._schema().load(response.json())
         
@@ -56,10 +69,8 @@ class ManagementApiService:
 
     def get_list(self, filter={}):
         """ Generic GET method for single object """
-        url = self._get_absolute_url()
-
         response = requests.get(
-            url=url, auth=self.auth, headers=self._headers,
+            url=self.url, auth=self.auth, headers=self._headers,
             verify=False
         )
 
@@ -70,12 +81,10 @@ class ManagementApiService:
 
     def create(self, obj):
         """ Generic POST method for creating a new object """
-        url = self._get_absolute_url()
-
         payload = self._schema().dump(obj)
         
         response = requests.post(
-            url=url, auth=self.auth, headers=self._headers,
+            url=self.url, auth=self.auth, headers=self._headers,
             json=payload, verify=False
         )
 
@@ -86,7 +95,9 @@ class ManagementApiService:
 
     def update(self, obj):
         """ Generic POST method for updating an object """
-        url = self._get_absolute_url(getattr(obj, self._id))
+        url = "/".join(
+            (self.url, getattr(obj, self._id))
+        )
         payload = self._schema().dump(obj)
 
         response = requests.put(
@@ -101,7 +112,9 @@ class ManagementApiService:
 
     def delete(self, obj):
         """ Generic DELETE method for deleting an object """
-        url = self._get_absolute_url(getattr(obj, self._id))
+        url = "/".join(
+            (self.url, getattr(obj, self._id))
+        )
 
         payload = self._schema().dump(obj)
 
@@ -116,31 +129,30 @@ class ManagementApiService:
         response.raise_for_status()
 
 
-class SitesEndpointService(ManagementApiService):
+class SitesManager(RestManager):
     """
     API Service representing the Sites endpoint.
     """
-    _endpoint = "organizations/{}/sites"
+    _model_name = "sites"
     _schema = serializers.SiteSerializer
     _model = models.Site
     _id = "site_id"
 
 
-class InternalNetworkEndpointService(ManagementApiService):
+class InternalNetworkManager(RestManager):
     """
     API Service representing the Internal Network endpoint.
     """
-    _endpoint = "organizations/{}/internalnetworks"
+    _model_name = "internalnetworks"
     _schema = serializers.InternalNetworkSerializer
     _model = models.InternalNetwork
     _id = "internal_network_id"
 
 
 
-class InternalNetworkCsvService:
+class CsvManager(BaseManager):
     """
-    Backend service to interact with CSV files for Internal networks.
-    EXPECTED FORMAT: <name>,<network>,<prefix>,<site_name>
+    Base CSV Manager to help with import and export of models from the API.
     """
 
     def __init__(self, fp, delimiter=","):
@@ -154,34 +166,7 @@ class InternalNetworkCsvService:
         except IOError:
             raise
 
-    def sites(self):
-        """
-        Returns the list of unique sites in the internal networks.
-        """
-        sites = set()
 
-        for line in self._csv_lines:
-            sites.add(models.Site(line['site_name']))
-        
-        return sites
-
-    def internal_networks(self):
-        """
-        Returns the list of internal networks
-        """
-        internal_networks = []
-        for line in self._csv_lines:
-            internal_networks.append(
-                models.InternalNetwork(
-                    name=line['name'],
-                    ip_address=line['network'],
-                    prefix_length=line['prefix'],
-                    site_name=line['site_name']
-                )
-            )
-
-        return internal_networks
-    
 
 
     

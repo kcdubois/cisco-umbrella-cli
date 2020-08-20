@@ -6,8 +6,8 @@ import click
 import requests
 from requests.auth import HTTPBasicAuth
 
-from umbrella_cli import services
-from umbrella_cli.models import InternalNetwork, Site
+from umbrella_cli import managers
+from umbrella_cli import models
 
 
 @click.group(name="internal-networks")
@@ -20,7 +20,7 @@ def internal_networks(ctx):
 @click.pass_context
 def get_all(ctx):
     """ Get the list of internal networks """
-    api = services.InternalNetworkEndpointService(
+    api = managers.InternalNetworkManager(
         access=ctx.obj["ACCESS"],
         secret=ctx.obj["SECRET"],
         org_id=ctx.obj["ORG"]
@@ -54,13 +54,13 @@ def get_all(ctx):
 @click.argument("filepath")
 @click.pass_context
 def bulk_import(ctx, filepath):
-    api = services.InternalNetworkEndpointService(
+    api = managers.InternalNetworkManager(
         access=ctx.obj["ACCESS"],
         secret=ctx.obj["SECRET"],
         org_id=ctx.obj["ORG"]
     )
 
-    sites_api = services.SitesEndpointService(
+    sites_api = managers.SitesManager(
         access=ctx.obj["ACCESS"],
         secret=ctx.obj["SECRET"],
         org_id=ctx.obj["ORG"]
@@ -70,7 +70,7 @@ def bulk_import(ctx, filepath):
         existing_networks = api.get_list()
         sites = sites_api.get_list()
 
-        csv_service = services.InternalNetworkCsvService(filepath)
+        csv_service = managers.InternalNetworkCsvService(filepath)
 
         networks_to_import = csv_service.internal_networks()
 
@@ -93,7 +93,7 @@ def bulk_import(ctx, filepath):
                         fg="yellow"
                     )
                     site = sites_api.create(
-                            Site(name=internal_network.site_name)
+                            models.Site(name=internal_network.site_name)
                         )
                     sites.append(site)
 
@@ -103,7 +103,9 @@ def bulk_import(ctx, filepath):
                     )
                         
                 click.secho(
-                    f"-> Creating network {internal_network.name}({internal_network.ip_address}/{str(internal_network.prefix_length)})"
+                    f"-> Creating network {internal_network.name}"
+                    f"({internal_network.ip_address}/"
+                    f"{str(internal_network.prefix_length)})"
                 )
 
                 if site:
@@ -112,7 +114,9 @@ def bulk_import(ctx, filepath):
                 new_networks_created.append(api.create(internal_network))
             else:
                 click.secho(
-                    f"-> Skipping network {internal_network.name}({internal_network.ip_address}/{str(internal_network.prefix_length)})"
+                    f"-> Skipping network {internal_network.name}"
+                    f"({internal_network.ip_address}/"
+                    f"{str(internal_network.prefix_length)})"
                 )
         click.secho(
             f"Created a total of {str(len(new_networks_created))} network(s)",

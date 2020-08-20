@@ -1,5 +1,8 @@
 {
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
-    "editor.rulers": [80]
+    "editor.rulers": [
+        80
+    ],
+    "python.pythonPath": "/Users/kcouderc/.local/share/virtualenvs/cisco-umbrella-cli-B91qGPP0/bin/python"
 }
