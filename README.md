@@ -1,5 +1,5 @@
-https://travis-ci.org/kcdubois/cisco-umbrella-cli.svg?branch=master
 # Umbrella CLI
+[![Build Status](https://travis-ci.org/kcdubois/cisco-umbrella-cli.svg?branch=master)](https://travis-ci.org/kcdubois/cisco-umbrella-cli)
 
 Umbrella CLI is a CLI tool to help with interacting with the Cisco Umbrella API for batch jobs and information retrieval.
 
