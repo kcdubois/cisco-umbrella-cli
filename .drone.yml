@@ -11,4 +11,14 @@ steps:
       - pipenv install --system --dev
       - pytest -v
 
-    
+  - name: publish to pypi
+    image: plugins/pypi
+    settings:
+      username: __token__
+      password: 
+        from_secret: pypi_token
+      distribution:
+        - bdist_wheel
+    when:
+      event:
+        - tag
