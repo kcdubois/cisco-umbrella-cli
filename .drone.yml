@@ -1,0 +1,15 @@
+---
+kind: pipeline
+image: docker
+name: default
+
+steps:
+  - name: test package
+    image: python:3.8
+    commands:
+      - pip install  pipenv
+      - pipenv install --system --dev
+      - pytest -v
+  
+  - name: build package
+    
