@@ -10,6 +10,5 @@ steps:
       - pip install  pipenv
       - pipenv install --system --dev
       - pytest -v
-  
-  - name: build package
+
     
